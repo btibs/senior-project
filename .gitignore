@@ -1,0 +1,5 @@
+*.pyc
+corsika/*
+data/*
+*.out
+*.dat
