@@ -3,3 +3,5 @@ corsika/*
 data/*
 *.out
 *.dat
+*.png
+*.gz
