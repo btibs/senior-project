@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 import sys
-#sys.path.append("/scratch/showerLib/beth/")
-sys.path.append("C:\\Users\\Julie\\Desktop\\beth\\Senior Project\\sim\\")
+sys.path.append("/scratch/showerLib/beth/")
+
 import corsika
-import matplotlib
-#matplotlib.rcParams['backend'] = 'QtAgg'
+import matplotlib	# lab version is 0.99.3
 
 import matplotlib.pyplot as plt
 
@@ -69,9 +68,13 @@ ax1.plot(xpts, ypts, "r.", label="particle data")
 ax1.set_xlabel("Position")
 ax1.set_ylabel("Position")
 ax1.set_title("Particle Map")
-ax1.set_xmargin(0.1)
-ax1.set_ymargin(0.1)
-ax1.autoscale()
+
+# not supported by lab version
+#ax1.set_xmargin(0.1)
+#ax1.set_ymargin(0.1)
+
+# also not supported?
+#ax1.autoscale()
 
 plt.show()
 
