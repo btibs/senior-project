@@ -3,12 +3,18 @@
 import sys
 sys.path.append("/scratch/showerLib/beth/")
 
+import math
+
 import corsika
 import matplotlib	# lab version is 0.99.3
 
 import matplotlib.pyplot as plt
 
-# currently does stuff / appears to work on both DAT and CER
+# currently does stuff / appears to work on particle data
+
+# find distance of particle from center
+def radialdist(x, y):
+	return math.sqrt(x**2 + y**2)
 
 if len(sys.argv) != 2 or sys.argv[1] == '-h':
 	print "Usage: %s <filename>"%sys.argv[0]
@@ -29,18 +35,11 @@ nsb = 0
 for sb in subblocks:
 	nsb+=1
 	particleblock = corsika.ParticleData(sb)
-	# print particleblock, dir(particleblock)
 	particledata.append(particleblock)
 	
+	# not actually used
 	cerblock = corsika.CherenkovData(sb)
-	# print cerblock, dir(cerblock)
 	cerdata.append(cerblock)
-	# print corsika.RunHeader(sb)
-	# print corsika.RunTrailer(sb), "events processed:",corsika.RunTrailer(sb).fEventsProcessed
-	# print corsika.EventHeader(sb)
-	# print corsika.EventTrailer(sb), "fParticles:", corsika.EventTrailer(sb).fParticles
-	#print "got a sb len: ", len(sb)
-	
 
 print "total subblocks were %s"%nsb
 
@@ -59,15 +58,18 @@ fig = plt.figure()
 ax1 = fig.add_subplot(111)
 xpts = []
 ypts = []
+maxdist = 0
 for p in particledata:
 	xpts.append(p.fX)
 	ypts.append(p.fY)
+	if radialdist(p.fX, p.fY) > maxdist:
+		maxdist = radialdist(p.fX, p.fY)
 
-ax1.plot(xpts, ypts, "r.", label="particle data")
+ax1.plot(xpts, ypts, "r,", label="particle data")
 
-ax1.set_xlabel("Position")
-ax1.set_ylabel("Position")
-ax1.set_title("Particle Map")
+ax1.set_xlabel("Position (m)")
+ax1.set_ylabel("Position (m)")
+ax1.set_title("Particle Distribution")
 
 # not supported by lab version
 #ax1.set_xmargin(0.1)
@@ -76,11 +78,33 @@ ax1.set_title("Particle Map")
 # also not supported?
 #ax1.autoscale()
 
-plt.show()
+# Now make a plot of density
+div = 0.1 # how finely divided to make the plots
+
+# loop through particles and place in bins
+distbins = [0]*int(maxdist/div + 1)
+print "maximum distance was:",maxdist
+print len(distbins)
+for p in particledata:
+	try:
+		dist = radialdist(p.fX, p.fY)
+		distbins[int(dist/div)] += 1
+	except:
+		print "error!", dist, int(dist/div)
+
+fig0 = plt.figure()
+ax0 = fig0.add_subplot(111)
+distx = [div*i for i in range(0, len(distbins))]
+ax0.plot(distx, distbins, 'b,-')
+ax0.fill_between(distx, distbins, facecolor='blue', alpha=0.3)
+ax0.set_xlabel("Distance from origin (m)")
+ax0.set_ylabel("Particles at distance")
+
+#print distx
+#print distbins
 
 '''
-# these both look the same and wrong
-
+# was not using earlier, both plots look the same (and wrong)
 # plot for cherenkov data
 fig2 = plt.figure()
 ax2 = fig2.add_subplot(111)
@@ -105,4 +129,6 @@ ax3.plot(xpts3, ypts3, "g.", label="particle data p3")
 ax3.set_title("particle data p")
 fig3.show()
 
-'''
+#'''
+
+plt.show()
