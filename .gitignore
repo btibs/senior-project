@@ -1,6 +1,6 @@
 *.pyc
-corsika/*
 data/*
+corsika/sphinx/*
 *.out
 *.dat
 *.png
