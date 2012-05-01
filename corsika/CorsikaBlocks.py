@@ -296,11 +296,11 @@ class ParticleData:
         self.fTorZ = subblock[6]*units.ns
         self.fWeight = subblock[7]
 
-    def IsParticle():
+    def IsParticle(self):
         return 0 < self.fDescription and self.fDescription < 100000
-    def IsNucleus():
+    def IsNucleus(self):
         return 100000 <= self.fDescription and self.fDescription < 9900000
-    def IsCherenkov():
+    def IsCherenkov(self):
         return 9900000 <= self.fDescription
 
     def __str__(self):
