@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # lab python is 2.6.6
 
-import sys
+import sys, os
 import corsika
 
 import matplotlib	# lab version is 0.99.3
@@ -24,6 +24,7 @@ if len(sys.argv) != 2 or sys.argv[1] == '-h':
 
 filename = sys.argv[1]
 cors_file = corsika.CorsikaFile(filename)
+prefix = os.path.split(filename)[-1]
 
 cors_file.Check()
 
@@ -71,11 +72,12 @@ ax1.set_ylim(lim*-1, lim)
 ax1.set_xlim(lim*-1, lim)
 
 # make density plot
-distbins = [0] * (int(maxdists[i]/div)+1)
+distbins = [0] * (int(maxdist/div)+1)
 for p in particledata:
 	distbins[int(radialdist(p.fX, p.fY)/div)] += 1
 
 distx = [div*i for i in range(0, len(distbins))]
+plt.savefig("%s-map.png"%prefix)
 
 fig0 = plt.figure()
 ax0 = fig0.add_subplot(111)
@@ -85,6 +87,8 @@ ax0.set_ylim(0, ax0.get_ylim()[1])
 ax0.set_xlabel("Distance from origin (cm)")
 ax0.set_ylabel("Number of particles (%s cm bins)"%div)
 ax0.set_title("Number of particles vs. distance")
+
+plt.savefig("%s-numparts.png"%prefix)
 
 densbins = [0]*len(distbins)
 for i in range(0, len(distbins)):
@@ -99,6 +103,8 @@ ax00.set_ylim(0, ax00.get_ylim()[1])
 ax00.set_xlabel("Distance from origin (cm)")
 ax00.set_ylabel("Density of particles (per cm^2)")
 ax00.set_title("Density of particles vs. distance")
+
+plt.savefig("%s-densparts.png"%prefix)
 
 # these both look the same and wrong
 '''
@@ -127,5 +133,5 @@ ax3.set_title("particle data p")
 #fig3.show()
 #'''
 
-plt.show()
+#plt.show()
 

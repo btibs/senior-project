@@ -7,23 +7,52 @@ import sys
 import corsika
 
 import matplotlib	# lab version is 0.99.3
+matplotlib.use('Agg') # to run over network
 import matplotlib.pyplot as plt
 
 import math
 
 # currently works on DAT* files, not CER
 
-filelist = ["data\\20120215-150008\\DAT000001", "data\\DAT000001", "data\\DAT000004"]
-descriptions = ["1 PeV", "1 PeV, 5 runs", "1 PeV"]
-colors = ['b', 'g', 'r'] # add more later
+#filelist = ["data\\20120215-150008\\DAT000001", "data\\DAT000001", "data\\DAT000004"]
+#descriptions = ["1 PeV", "1 PeV, 5 runs", "1 PeV"]
+
+# this gets very sad in lab with giant files ... hooopefully not a memoryerror
+# ALSO: put these in order of size desc otherwise the points will get covered up
+filelist = [
+#			"/scratch/showerLib/beth/DAT000006",
+#			"/scratch/showerLib/beth/DAT000007",
+
+#			"/scratch/showerLib/beth/DAT000005",
+			"/scratch/showerLib/beth/DAT000003",
+
+#			"/scratch/showerLib/beth/DAT000002",
+#			"/scratch/showerLib/beth/DAT000001",
+
+			"/scratch/showerLib/beth/DAT000004",
+		]
+descriptions = [
+#				"??? 6",
+#				"??? 7",
+
+#				"100 PeV (5)",
+				"100 PeV (3)",
+
+#				"10 PeV (5 runs)",
+#				"1 PeV (5 runs)",
+
+				"1 PeV",
+			]
+
+colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k'] # todo: loop / add more
 particlelists = []
 
 # return distance from origin
 def radialdist(x, y):
 	return math.sqrt(x**2.0 + y**2.0)
 
-if len(sys.argv) > 1 and sys.argv[1] == '-h':
-	print "Usage: %s"%sys.argv[0]
+if len(sys.argv) != 2 or sys.argv[1] == '-h':
+	print "Usage: %s fileprefix"%sys.argv[0]
 	print "Plots hardcoded list of DAT files on same axes"
 	print "use plot.py instead to plot individual files"
 	#print 'For an example: %s $AUGEROFFLINEROOT/share/auger-offline/doc/SampleShowers/Corsika-1e19-6.part'%sys.argv[0]
@@ -31,10 +60,15 @@ if len(sys.argv) > 1 and sys.argv[1] == '-h':
 
 	exit(0)
 
+prefix = sys.argv[1]
+
 for filename in filelist:
+	print "now loading %s..." % filename
 	cors_file = corsika.CorsikaFile(filename)
 
 	cors_file.Check()
+
+	print "loaded"
 
 	# Arrays to store the data
 	particledata = []	# particle data
@@ -69,7 +103,7 @@ for i in range(0, len(filelist)):
 		if radialdist(p.fX, p.fY) > maxdists[i]:
 			maxdists[i] = radialdist(p.fX, p.fY)
 
-	ax1.plot(xpts, ypts, ".", label=descriptions[i], color=colors[i])
+	ax1.plot(xpts, ypts, ",", label=descriptions[i], color=colors[i], alpha=0.7)
 
 ax1.set_xlabel("Position (cm)")
 ax1.set_ylabel("Position (cm)")
@@ -83,6 +117,10 @@ lim = max(maxx, maxy)
 ax1.set_ylim(lim*-1, lim)
 ax1.set_xlim(lim*-1, lim)
 
+# save plot
+plt.savefig("%s-multiplot-map.png"%prefix)
+print "saved map plot"
+
 # make density plot
 fig0 = plt.figure()
 ax0 = fig0.add_subplot(111)
@@ -93,7 +131,7 @@ for i in range(0, len(filelist)):
 
 	distx = [div*j for j in range(0, len(distbins))]
 
-	ax0.plot(distx, distbins, '.-', color=colors[i], label=descriptions[i])
+	ax0.plot(distx, distbins, ',-', color=colors[i], label=descriptions[i], alpha=0.7)
 	ax0.fill_between(distx, distbins, color=colors[i], alpha=0.3)
 
 ax0.set_ylim(0, ax0.get_ylim()[1])
@@ -101,6 +139,9 @@ ax0.set_xlabel("Distance from origin (cm)")
 ax0.set_ylabel("Number of particles (%s cm bins)"%div)
 ax0.set_title("Number of particles vs. distance")
 ax0.legend()
+
+plt.savefig("%s-multiplot-numparts.png"%prefix)
+print "saved number plot"
 
 '''
 densbins = [0]*len(distbins)
@@ -145,5 +186,5 @@ ax3.set_title("particle data p")
 #fig3.show()
 #'''
 
-plt.show()
+#plt.show()
 
