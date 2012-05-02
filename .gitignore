@@ -5,3 +5,7 @@ corsika/sphinx/*
 *.dat
 *.png
 *.gz
+*.pdf
+*.zip
+*.gz
+*.tar

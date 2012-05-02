@@ -38,16 +38,13 @@ for sb in subblocks:
 	particleblock = corsika.ParticleData(sb)
 	particledata.append(particleblock)
 	
-	# broken, do not work
-	print "cherenkov?",particleblock.IsCherenkov(), "; particle?", particleblock.IsParticle()
-	
 	cerblock = corsika.CherenkovData(sb)
 	cerdata.append(cerblock)
 
 print "total subblocks were %s"%nsb
 
 # make plot of position of particles
-div = 0.1 # for density plot
+div = 1.0 # for density plot
 
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
@@ -62,9 +59,15 @@ for p in particledata:
 
 ax1.plot(xpts, ypts, "r,", label="particle data")
 
-ax1.set_xlabel("Position (m)")
-ax1.set_ylabel("Position (m)")
+ax1.set_xlabel("Position (cm)")
+ax1.set_ylabel("Position (cm)")
 ax1.set_title("Particle Map")
+
+# square plot
+maxy = max([abs(i) for i in ax1.get_ylim()])
+ax1.set_ylim(maxy*-1, maxy)
+maxx = max([abs(i) for i in ax1.get_xlim()])
+ax1.set_xlim(maxx*-1, maxx)
 
 # make density plot
 distbins = [0] * (int(maxdist/div)+1)
@@ -78,8 +81,8 @@ ax0 = fig0.add_subplot(111)
 ax0.plot(distx, distbins, 'b.-')
 ax0.fill_between(distx, distbins, color='blue', alpha=0.3)
 ax0.set_ylim(0, ax0.get_ylim()[1])
-ax0.set_xlabel("Distance from origin (m)")
-ax0.set_ylabel("Number of particles (bins %s m)"%div)
+ax0.set_xlabel("Distance from origin (cm)")
+ax0.set_ylabel("Number of particles (%s cm bins)"%div)
 ax0.set_title("Number of particles vs. distance")
 
 densbins = [0]*len(distbins)
@@ -92,12 +95,12 @@ ax00 = fig00.add_subplot(111)
 ax00.plot(distx, densbins, 'b.-')
 ax00.fill_between(distx, densbins, color='blue', alpha=0.3)
 ax00.set_ylim(0, ax00.get_ylim()[1])
-ax00.set_xlabel("Distance from origin (m)")
-ax00.set_ylabel("Density of particles (per m^2)")
+ax00.set_xlabel("Distance from origin (cm)")
+ax00.set_ylabel("Density of particles (per cm^2)")
 ax00.set_title("Density of particles vs. distance")
 
 # these both look the same and wrong
-#'''
+'''
 # plot for cherenkov data
 fig2 = plt.figure()
 ax2 = fig2.add_subplot(111)
